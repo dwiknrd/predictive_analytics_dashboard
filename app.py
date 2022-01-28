@@ -3,6 +3,7 @@ import plotly.graph_objects as go
 import joblib
 
 from sklearn.preprocessing import OneHotEncoder
+from sklearn.metrics import accuracy_score, precision_score, recall_score
 
 import dash
 from dash import dcc
@@ -47,6 +48,49 @@ X_test_dummy = pd.concat([X_test.select_dtypes(exclude='category'),
 # input prediction
 baris=0
 
+# Card Contents
+y_pred_dt_test_up = model.predict(X_test_dummy)
+acc_score = ((accuracy_score(y_true=y_test, y_pred=y_pred_dt_test_up))*100).round(2)
+pred_score = ((precision_score(y_true=y_test, y_pred=y_pred_dt_test_up, pos_label=1))*100).round(2)
+recall = ((recall_score(y_true=y_test, y_pred=y_pred_dt_test_up, pos_label=1))*100).round(2)
+
+
+card_accuracy = [
+    dbc.CardHeader("Accuracy Score"),
+    dbc.CardBody(
+        [
+            html.H1(
+                f"{acc_score}%",
+                className="card-text",
+            ),
+        ]
+    ),
+]
+
+card_precision = [
+    dbc.CardHeader("Precision Score"),
+    dbc.CardBody(
+        [
+            html.H1(
+                f"{pred_score}%",
+                className="card-text",
+            ),
+        ]
+    ),
+]
+
+card_recall = [
+    dbc.CardHeader("Recall Score"),
+    dbc.CardBody(
+        [
+            html.H1(
+                f"{recall}%",
+                className="card-text",
+            ),
+        ]
+    ),
+]
+
 app = dash.Dash(external_stylesheets=[dbc.themes.LUX])
 app.title = 'Predictive Analytics Dashboard'
 server = app.server
@@ -60,25 +104,33 @@ app.layout = html.Div(children=[
         color="maroon",
     ),
     html.Br(),
+    dbc.Row(
+        dbc.Alert(id='tbl_out', color='dark'),
+    ),
     dbc.Row([
-        dbc.Col(dash_table.DataTable(
-            id='table_data_test',
-            columns=[{'name': i, 'id': i} for i in X_test.columns],
-            data=X_test.to_dict('records'),
-            fixed_rows={'headers': True},
-            style_cell={
-                'minWidth':80, 'maxWidth': 300, 'width': 110
-            },
-            style_header={
-                'backgroundColor': 'maroon',
-                'color': 'black'
-            },
-            style_data={
-                'backgroundColor': 'gray',
-                'color': 'black'
-            }
+        dbc.Col([
+            html.Br(), html.Br(),
+            dbc.Row(
+                dash_table.DataTable(
+                id='table_data_test',
+                columns=[{'name': i, 'id': i} for i in X_test.columns],
+                data=X_test.to_dict('records'),
+                fixed_rows={'headers': True},
+                style_cell={
+                    'minWidth':80, 'maxWidth': 300, 'width': 110
+                },
+                style_header={
+                    'backgroundColor': 'maroon',
+                    'color': 'black'
+                },
+                style_data={
+                    'backgroundColor': 'darkgray',
+                    'color': 'black'
+                }
 
-        ), width=6),
+        ),
+            )
+        ], width=6),
         # dbc.Col(dcc.Graph(id='prediction'), width=6), 
         dbc.Col(
             [
@@ -108,9 +160,15 @@ app.layout = html.Div(children=[
                         )),
             )
                 ),
-                dbc.Row(
-                    dbc.Alert(id='tbl_out', color='dark'),
-                )
+                dbc.Row([
+                    dbc.Col(dbc.Card(card_accuracy, color="darkgray", inverse=True)),
+                    dbc.Col(dbc.Card(card_precision, color="gray", inverse=True)),
+                    dbc.Col(dbc.Card(card_recall, color="maroon", inverse=True)),
+                ]),
+                html.Br(),
+                # dbc.Row(
+                #     dbc.Alert(id='tbl_out', color='dark'),
+                # )
             ], width=6), 
 ])
 ])
