@@ -1,5 +1,3 @@
-from decouple import config
-
 import pandas as pd
 import plotly.graph_objects as go
 import joblib
