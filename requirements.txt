@@ -12,3 +12,4 @@ preshed==3.0.5
 python-decouple
 scikit-learn==0.24.2
 gunicorn==19.7.1
+Werkzeug==2.1.0
