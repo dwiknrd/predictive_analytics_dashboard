@@ -224,4 +224,4 @@ def update_graphs(active_cell):
     
 
 if __name__ == "__main__":
-    app.run_server(port = config('PORT') or 5001)
+    app.run_server()
