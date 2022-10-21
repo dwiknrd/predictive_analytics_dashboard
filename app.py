@@ -1,3 +1,5 @@
+from decouple import config
+
 import pandas as pd
 import plotly.graph_objects as go
 import joblib
@@ -222,4 +224,4 @@ def update_graphs(active_cell):
     
 
 if __name__ == "__main__":
-    app.run_server()
+    app.run_server(port = config('PORT') or 5001)
